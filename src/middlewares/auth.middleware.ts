@@ -3,7 +3,13 @@ import { verify } from 'jsonwebtoken';
 import { SECRET_KEY } from '@config';
 import { HttpException } from '@exceptions/HttpException';
 import { DataStoredInToken, RequestWithUser } from '@interfaces/auth.interface';
-import userModel from '@models/users.model';
+
+const user = {
+  id: '1',
+  name: 'Daniel',
+};
+
+// TODO: Connect to the user microservice to get complete this.
 
 const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
   try {
@@ -13,10 +19,11 @@ const authMiddleware = async (req: RequestWithUser, res: Response, next: NextFun
       const secretKey: string = SECRET_KEY;
       const verificationResponse = (await verify(Authorization, secretKey)) as DataStoredInToken;
       const userId = verificationResponse._id;
-      const findUser = await userModel.findById(userId);
+      // const findUser = await userModel.findById(userId);
+      const findUser = user;
 
       if (findUser) {
-        req.user = findUser;
+        // req.user = findUser;
         next();
       } else {
         next(new HttpException(401, 'Wrong authentication token'));
