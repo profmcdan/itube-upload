@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import { connect, set } from 'mongoose';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { NODE_ENV, PORT, LOG_FORMAT, ORIGIN, CREDENTIALS } from '@config';
+import { CREDENTIALS, appEnvs } from '@config';
 import { dbConnection } from '@databases';
 import { Routes } from '@interfaces/routes.interface';
 import errorMiddleware from '@middlewares/error.middleware';
@@ -21,10 +21,12 @@ class App {
 
   constructor(routes: Routes[]) {
     this.app = express();
-    this.env = NODE_ENV || 'development';
-    this.port = PORT || 3000;
+    this.env = appEnvs.nodeEnv || 'development';
+    this.port = appEnvs.port || 3000;
 
-    this.connectToDatabase();
+    this.connectToDatabase()
+      .then(() => logger.info('Database connected'))
+      .catch(e => logger.error(e.toString()));
     this.initializeMiddlewares();
     this.initializeRoutes(routes);
     this.initializeSwagger();
@@ -44,17 +46,17 @@ class App {
     return this.app;
   }
 
-  private connectToDatabase() {
+  private async connectToDatabase() {
     if (this.env !== 'production') {
       set('debug', true);
     }
-
-    connect(dbConnection.url, dbConnection.options);
+    set('strictQuery', false);
+    await connect(dbConnection.uri, dbConnection.options);
   }
 
   private initializeMiddlewares() {
-    this.app.use(morgan(LOG_FORMAT, { stream }));
-    this.app.use(cors({ origin: ORIGIN, credentials: CREDENTIALS }));
+    this.app.use(morgan(appEnvs.logFormat, { stream }));
+    this.app.use(cors({ origin: appEnvs.origin, credentials: CREDENTIALS }));
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(compression());
@@ -65,7 +67,7 @@ class App {
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
-      this.app.use('/', route.router);
+      this.app.use('/api/v1', route.router);
     });
   }
 
@@ -73,16 +75,16 @@ class App {
     const options = {
       swaggerDefinition: {
         info: {
-          title: 'REST API',
+          title: 'iTube Video Upload REST API',
           version: '1.0.0',
-          description: 'Example docs',
+          description: 'iTube Video Upload REST API docs',
         },
       },
       apis: ['swagger.yaml'],
     };
 
     const specs = swaggerJSDoc(options);
-    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+    this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
   }
 
   private initializeErrorHandling() {
