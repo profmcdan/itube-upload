@@ -4,9 +4,12 @@ import { isEmpty } from '@utils/util';
 import { HttpException } from '@exceptions/HttpException';
 import { CreateVideoDto } from '@dtos/videos.dto';
 import VideoRoute from '@routes/video.route';
+import channelModel from "@models/channel.model";
+import channelController from "@controllers/channel.controller";
 
 class VideoService {
   public videos = videoModel;
+  private channels = channelModel;
 
   public async findAllVideos(): Promise<Video[]> {
     return this.videos.find();
@@ -23,6 +26,8 @@ class VideoService {
 
   public async createVideo(videoData: CreateVideoDto): Promise<Video> {
     if (isEmpty(videoData)) throw new HttpException(400, 'videoData is empty');
+    const channel = await this.channels.findOne({ _id: videoData.channelId });
+    if (!channel) throw new HttpException(400, 'ChannelId is invalid');
 
     return await this.videos.create({ ...videoData });
   }

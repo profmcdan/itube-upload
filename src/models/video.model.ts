@@ -21,6 +21,15 @@ const videoSchema: Schema = new Schema({
     type: String,
     required: true,
   },
+  channelId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Channel',
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const videoModel = model<Video & Document>('Video', videoSchema);

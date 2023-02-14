@@ -15,4 +15,7 @@ export class CreateVideoDto {
 
   @IsString()
   public ownerId: string;
+
+  @IsString()
+  public channelId: string;
 }

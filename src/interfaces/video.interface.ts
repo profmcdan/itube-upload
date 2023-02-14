@@ -1,5 +1,3 @@
-import { User } from '@interfaces/users.interface';
-
 export interface Video {
   _id: string;
   title: string;
@@ -7,4 +5,6 @@ export interface Video {
   accessType: boolean;
   size: number;
   ownerId: string;
+  channelId: string;
+  createdAt: Date;
 }
