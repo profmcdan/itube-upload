@@ -20,11 +20,11 @@ class ChannelService {
     return channel;
   }
 
-  public async createChannel(channelData: CreateChannelDto, bannerUrl: string): Promise<Channel> {
+  public async createChannel(channelData: CreateChannelDto): Promise<Channel> {
     if (isEmpty(channelData)) throw new HttpException(400, 'channelData is empty');
     const title = channelData.title.toLowerCase().split(' ').join('-');
     const slug = title + '-' + Date.now().toString();
-    return await this.channels.create({ ...channelData, slug: slug, bannerUrl: bannerUrl });
+    return await this.channels.create({ ...channelData, slug: slug });
   }
 
   public async updateChannel(channelId: string, channelData: CreateChannelDto): Promise<Channel> {

@@ -5,7 +5,7 @@ export class CreateChannelDto {
   public title: string;
 
   @IsString()
-  public bannerImage: Express.Multer.File;
+  public bannerUrl: string;
 
   @IsBoolean()
   public isPublic: boolean;
