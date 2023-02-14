@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import * as process from 'process';
 config({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
 
 export const CREDENTIALS = process.env.CREDENTIALS === 'true';
@@ -17,4 +18,8 @@ export const appEnvs = {
   logFormat: LOG_FORMAT,
   logDir: LOG_DIR,
   origin: ORIGIN,
+  azureStorageName: process.env.AZ_STORAGE_NAME,
+  azureStorageKey: process.env.AZ_STORAGE_KEY,
+  azStorageContainer: process.env.AZ_CONTAINER_NAME,
+  azureStorageConnStr: process.env.AZ_STORAGE_CONN,
 };

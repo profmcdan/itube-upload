@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import ChannelService from '@services/channel.service';
 import { Channel } from '@interfaces/channel.interface';
 import { CreateChannelDto } from '@dtos/channels.dto';
+import { FilesAzureService } from '@services/file.service';
 
 class ChannelController {
   public channelService = new ChannelService();
@@ -27,8 +28,12 @@ class ChannelController {
 
   public createChannel = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const bannerImage = req.file;
+      const azureStorage = new FilesAzureService();
+      const uploadedBannerUrl = await azureStorage.uploadFile(bannerImage);
+
       const channelData: CreateChannelDto = req.body;
-      const channel: Channel = await this.channelService.createChannel(channelData);
+      const channel: Channel = await this.channelService.createChannel(channelData, uploadedBannerUrl);
       res.status(201).json({ data: channel });
     } catch (error) {
       next(error);
